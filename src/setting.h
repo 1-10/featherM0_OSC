@@ -18,10 +18,10 @@ struct LED{
 };
 
 /******************** OSC Protocol settings ************************/
-#define OSC_HEADER_START "/start"
-#define OSC_HEADER_BUTTON "/button"
-#define OSC_TAG_NEOPIXEL "neo"
-#define OSC_TAG_LED "led"
+#define OSC_ADDRESS_START "start"
+#define OSC_ADDRESS_BUTTON "button"
+#define OSC_ADDRESS_NEOPIXEL "neo"
+#define OSC_ADDRESS_LED "led"
 
 #define OSC_JAPANESE 0
 #define OSC_ENGLISH 1S

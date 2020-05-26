@@ -189,8 +189,8 @@ enum ACTION checkOSCpackets(){
       // debug.print(dataCount, DEBUG_OSC);
       debug.println(address, DEBUG_OSC);
       // Check address and dev number
-      if (address.startsWith(OSC_TAG_NEOPIXEL) && dataCount == 1){
-        uint8_t tagSize = sizeof(OSC_TAG_NEOPIXEL) -1;
+      if (address.startsWith(OSC_ADDRESS_NEOPIXEL) && dataCount == 1){
+        uint8_t tagSize = sizeof(OSC_ADDRESS_NEOPIXEL) -1;
         uint8_t ballNum = uint8_t(address.charAt(tagSize)) - '0'; // converting char -> ascii -> uint8
         // debug.println(ballNum, DEBUG_OSC);
         if (ballNum == MY_NUM){
@@ -210,8 +210,8 @@ enum ACTION checkOSCpackets(){
           debug.printlnNumHex(led.w, DEBUG_OSC);
         }
       }
-      if (address.startsWith(OSC_TAG_LED) && dataCount == 1){
-        uint8_t tagSize = sizeof(OSC_TAG_NEOPIXEL) -1;
+      if (address.startsWith(OSC_ADDRESS_LED) && dataCount == 1){
+        uint8_t tagSize = sizeof(OSC_ADDRESS_NEOPIXEL) -1;
         uint8_t standbyNum = uint8_t(address.charAt(tagSize)) - '0'; // converting char -> ascii -> uint8
         if (standbyNum == MY_NUM){
           uint8_t val = value_OSC_i[0] & 0x1;
@@ -241,15 +241,15 @@ enum ACTION checkOSCpackets(){
   // #endif
 
   for (uint8_t i = 0; i < UDP_TX_PACKET_MAX_SIZE; i ++) packetBuffer[i] = 0;
-  String OSC_message = "";
+  String OSC_message = "/";
   uint8_t osc_responce = 0;
   switch (stat){
     case STARTED:
-      OSC_message = OSC_HEADER_START;
+      OSC_message += OSC_ADDRESS_START;
       osc_responce = 1;
     break;
     case BUTTON_PUSHED:
-      OSC_message = OSC_HEADER_BUTTON;
+      OSC_message += OSC_ADDRESS_BUTTON;
       osc_responce = 1;
     break;
     case NONE:
@@ -263,27 +263,29 @@ enum ACTION checkOSCpackets(){
     break;
   }
 
-  OSC_message += String(MY_NUM);
-  snprintf(packetBuffer, OSC_message.length() + 1, OSC_message.c_str());
-  uint8_t tabPointer = (OSC_message.length()/4 + 1) * 4;
-  debug.println(tabPointer, DEBUG_OSC);
-  packetBuffer[tabPointer++] = ',';
-  packetBuffer[tabPointer++] = 'i';
-  tabPointer = (tabPointer/4 + 1)*4 + 3;
+  if (sizeof(OSC_message) <= 1){
+    OSC_message += String(MY_NUM);
+    snprintf(packetBuffer, OSC_message.length() + 1, OSC_message.c_str());
+    uint8_t tabPointer = (OSC_message.length()/4 + 1) * 4;
+    debug.println(tabPointer, DEBUG_OSC);
+    packetBuffer[tabPointer++] = ',';
+    packetBuffer[tabPointer++] = 'i';
+    tabPointer = (tabPointer/4 + 1)*4 + 3;
 
-  packetBuffer[tabPointer++] = static_cast<char>(osc_responce);
+    packetBuffer[tabPointer++] = static_cast<char>(osc_responce);
 
-  debug.println(packetBuffer, DEBUG_OSC);
-  for (uint8_t i = 0; i < UDP_TX_PACKET_MAX_SIZE; i ++){
-    debug.printNumHex((uint8_t)packetBuffer[i], DEBUG_OSC);
-    
-    if (i%4 == 3) debug.print("\n", DEBUG_OSC);
-    else debug.print(" ", DEBUG_OSC);
+    debug.println(packetBuffer, DEBUG_OSC);
+    for (uint8_t i = 0; i < UDP_TX_PACKET_MAX_SIZE; i ++){
+      debug.printNumHex((uint8_t)packetBuffer[i], DEBUG_OSC);
+      
+      if (i%4 == 3) debug.print("\n", DEBUG_OSC);
+      else debug.print(" ", DEBUG_OSC);
+    }
+
+    Udp.beginPacket(host_IP, host_Port);
+    Udp.write(packetBuffer, UDP_TX_PACKET_MAX_SIZE);
+    Udp.endPacket();
   }
-
-  Udp.beginPacket(host_IP, host_Port);
-  Udp.write(packetBuffer, UDP_TX_PACKET_MAX_SIZE);
-  Udp.endPacket();
 }
 
 enum STATUS checkBtnState(){
