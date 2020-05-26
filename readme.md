@@ -20,4 +20,4 @@ PC側のアドレスは192.168.0.2, 受信ポートは8889
 デバイス側のアドレスは192.168.0.3, ポート:8888
 テスト環境に応じてポート番号変更のこと。
 
-![Set up](https://github.com/1-10/featherM0_OSC/IMG_1233e.jpg)
+![Set up](https://github.com/1-10/featherM0_OSC/blob/master/IMG_1233e.jpg?raw=true)
