@@ -34,7 +34,7 @@ EthernetUDP Udp;
 #include <Adafruit_NeoPixel.h>
 
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN_PIXELS, NEO_GRB + NEO_KHZ800);
-struct LED led = {0,0,0,0};
+struct LED led = {0x01,0,0,0};
 
 /********************************** VARIABLES **************************************************/
 bool buttonState = false;
@@ -66,8 +66,7 @@ void checkInputSwitch(){
 void controlNeoPixel(){
   for (uint8_t i = 0; i < NUMPIXELS; i++) {
     pixels.setPixelColor(i, pixels.Color(led.r, led.g, led.b));
-    debug.print(i, DEBUG_OSC);
-  }
+    }
   pixels.show();
 
 }
@@ -186,13 +185,13 @@ enum ACTION checkOSCpackets(){
     }
     if (addressFound){
       debug.print("address found: ", DEBUG_OSC);
-      // debug.print(dataCount, DEBUG_OSC);
+      debug.print(dataCount, DEBUG_OSC);
       debug.println(address, DEBUG_OSC);
       // Check address and dev number
       if (address.startsWith(OSC_ADDRESS_NEOPIXEL) && dataCount == 1){
         uint8_t tagSize = sizeof(OSC_ADDRESS_NEOPIXEL) -1;
         uint8_t ballNum = uint8_t(address.charAt(tagSize)) - '0'; // converting char -> ascii -> uint8
-        // debug.println(ballNum, DEBUG_OSC);
+        debug.println(ballNum, DEBUG_OSC);
         if (ballNum == MY_NUM){
           OSC_Action = NEOPIXEL;
           debug.println("matched", DEBUG_OSC);
@@ -263,7 +262,7 @@ enum ACTION checkOSCpackets(){
     break;
   }
 
-  if (sizeof(OSC_message) <= 1){
+  if (0 < sizeof(OSC_message)){
     OSC_message += String(MY_NUM);
     snprintf(packetBuffer, OSC_message.length() + 1, OSC_message.c_str());
     uint8_t tabPointer = (OSC_message.length()/4 + 1) * 4;
@@ -291,16 +290,16 @@ enum ACTION checkOSCpackets(){
 enum STATUS checkBtnState(){
   enum STATUS stat = NONE;
   if(digitalRead(INPUT_SWITCH) == LOW && !buttonState){
-    // #if DEBUG_LEVEL & DEBUG_OSC
-    // debug.ledOn();
-    // #endif
+    #if DEBUG_LEVEL & DEBUG_OSC
+    debug.ledOn();
+    #endif
     buttonState = true;
     stat = BUTTON_PUSHED;
   }
   else if(digitalRead(INPUT_SWITCH) == HIGH && buttonState){
-    // #if DEBUG_LEVEL & DEBUG_OSC
-    // debug.ledOff();
-    // #endif
+    #if DEBUG_LEVEL & DEBUG_OSC
+    debug.ledOff();
+    #endif
     buttonState = false;  
   }
   return stat;
@@ -308,37 +307,40 @@ enum STATUS checkBtnState(){
 
 void setup() {
 
-  Ethernet.init(CS_PIN);
-  Ethernet.begin(mac, ip);
+    Ethernet.init(CS_PIN);
+    Ethernet.begin(mac, ip);
 
-  Serial.begin(9600);
+    Serial.begin(9600);
 
-  // Check for Ethernet hardware present
-  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
-    debug.println("Ethernet shield was not found.  Sorry, bro. Can't run without hardware. :(", DEBUG_GENERAL);
-    while (true) {
-      delay(1); // do nothing, no point running without Ethernet hardware
+    // Check for Ethernet hardware present
+    if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+      debug.println("Ethernet shield was not found.  Sorry, bro. Can't run without hardware. :(", DEBUG_GENERAL);
+      while (true) {
+        delay(1); // do nothing, no point running without Ethernet hardware
+      }
     }
-  }
-  if (Ethernet.linkStatus() == LinkOFF) {
-    debug.println("Ethernet cable is not connected.", DEBUG_GENERAL);
-  }
+    if (Ethernet.linkStatus() == LinkOFF) {
+      debug.println("Ethernet cable is not connected.", DEBUG_GENERAL);
+    }
 
-  // start UDP
-  Udp.begin(localPort);
+    // start UDP
+    Udp.begin(localPort);
 
   // onboard LED setting
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(INPUT_SWITCH, INPUT_PULLUP);
+  pixels.begin();
+  pixels.clear();
 
   updateTimeStamp_ms = millis();
 
   // Start up message to PC
   sendOSCstatus(STARTED);
+  // controlLED(LED_ON);
+  controlLED(NEOPIXEL);
 }
 
 void loop() {
-  
   if (millis() - updateTimeStamp_ms > UPDATE_RATE_ms){
 
     // Check incoming message

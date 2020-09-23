@@ -11,7 +11,7 @@
 #define MY_NUM 1
 
 #define PIN_PIXELS 8
-#define NUMPIXELS 1
+#define NUMPIXELS 2
 
 struct LED{
     uint8_t r, g, b, w;
@@ -24,7 +24,7 @@ struct LED{
 #define OSC_ADDRESS_LED "led"
 
 #define OSC_JAPANESE 0
-#define OSC_ENGLISH 1S
+#define OSC_ENGLISH 1
 #define OSC_CHINESE 2
 
 // Currently not implemented, but feel free to mod!
@@ -49,8 +49,8 @@ enum ACTION {LED_ON, LED_OFF, NEOPIXEL, ACTION_NONE};
 #define MAC_ADDRESS_2 0x76
 #define MAC_ADDRESS_3 0xB6
 #define MAC_ADDRESS_4 0x11
-#define MAC_ADDRESS_5 0x83
-#define MAC_ADDRESS_6 0xb3
+#define MAC_ADDRESS_5 0xab
+#define MAC_ADDRESS_6 0xd5
 
 // And your IP address
 #define IP_ADDRESS_1 192
