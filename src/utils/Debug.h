@@ -24,10 +24,14 @@ class Debug{
         void println(int16_t, uint8_t level);
         void print(uint16_t, uint8_t level);
         void println(uint16_t, uint8_t level);
+        void print(int32_t, uint8_t level);
+        void println(int32_t, uint8_t level);
         // void println(const __FlashStringHelper*, uint8_t level);
         // void print(const __FlashStringHelper*, uint8_t level);
         void println(String, uint8_t level);
         void print(String, uint8_t level);
+        void println(char, uint8_t level);
+        void print(char, uint8_t level);
         void printlnNumHex(uint8_t, uint8_t level);
         void printNumHex(uint8_t, uint8_t level);
         void ledOn();

@@ -93,6 +93,26 @@ void Debug::println(uint16_t val, uint8_t level) {
     #endif
 }
 
+void Debug::print(int32_t val, uint8_t level)
+{
+#ifdef DEBUG
+    if (level & outputLevel)
+    {
+        stream->print(val);
+    }
+#endif
+}
+
+void Debug::println(int32_t val, uint8_t level)
+{
+#ifdef DEBUG
+    if (level & outputLevel)
+    {
+        stream->println(val);
+    }
+#endif
+}
+
 void Debug::println(String str, uint8_t level) {
     #ifdef DEBUG
         if ( level & outputLevel ){
@@ -107,6 +127,26 @@ void Debug::print(String str, uint8_t level) {
             stream->print(str);
         }
     #endif
+}
+
+void Debug::println(char chr, uint8_t level)
+{
+#ifdef DEBUG
+    if (level & outputLevel)
+    {
+        stream->println(chr);
+    }
+#endif
+}
+
+void Debug::print(char chr, uint8_t level)
+{
+#ifdef DEBUG
+    if (level & outputLevel)
+    {
+        stream->print(chr);
+    }
+#endif
 }
 
 void Debug::printlnNumHex(uint8_t val, uint8_t level) {

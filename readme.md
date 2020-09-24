@@ -1,5 +1,8 @@
 # OSC implementation for Adafruit Feather + EtherWing
 ## What
+Well, this is yet another OSC handling code for Arduino, mainly for Feather.
+In many case, it is just better using [the original CNMAT Arduino OSC library](https://github.com/CNMAT/OSC).
+
 [Adafruit Featehr M0](https://learn.adafruit.com/adafruit-feather-m0-express-designed-for-circuit-python-circuitpython)または[M4](https://learn.adafruit.com/adafruit-feather-m4-express-atsamd51)と[Ethernet FeatherWing](https://www.adafruit.com/product/3201)の組み合わせにより小型のOSCモジュールを作った。ArduOSCはArduino Feather環境では依存関係が崩れてしまいそのままだとコンパイルできなかったため自力で実装した。依存関係はEthernetおよびEthernetUDP。platformio.iniを参照のこと。
 
 ArduinoUnoにEthernetモジュールを載せると大型になり、また割り込み関係でNeoPixelと共存させられないなどの課題が多い。MbedにEthernetモジュールをつけることも出来るが、基板上での配線が必要となり、さほど小さく出来ない。Featherシステムを使うとスタックさせるだけでモジュールとして完成するのでサイズがコンパクトに出来、インスタレーション等での応用がしやすいと思われる。
