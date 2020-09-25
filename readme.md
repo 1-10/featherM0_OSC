@@ -1,25 +1,38 @@
 # OSC implementation for Adafruit Feather + EtherWing
 ## What
 Well, this is yet another OSC handling code for Arduino, mainly for Feather.
-In many case, it is just better using [the original CNMAT Arduino OSC library](https://github.com/CNMAT/OSC).
+In many case, it would be just better using [the original CNMAT Arduino OSC library](https://github.com/CNMAT/OSC). I wrote this code for my particular project due to restricted time and limited use of OSC
 
 [Adafruit Featehr M0](https://learn.adafruit.com/adafruit-feather-m0-express-designed-for-circuit-python-circuitpython)または[M4](https://learn.adafruit.com/adafruit-feather-m4-express-atsamd51)と[Ethernet FeatherWing](https://www.adafruit.com/product/3201)の組み合わせにより小型のOSCモジュールを作った。ArduOSCはArduino Feather環境では依存関係が崩れてしまいそのままだとコンパイルできなかったため自力で実装した。依存関係はEthernetおよびEthernetUDP。platformio.iniを参照のこと。
 
 ArduinoUnoにEthernetモジュールを載せると大型になり、また割り込み関係でNeoPixelと共存させられないなどの課題が多い。MbedにEthernetモジュールをつけることも出来るが、基板上での配線が必要となり、さほど小さく出来ない。Featherシステムを使うとスタックさせるだけでモジュールとして完成するのでサイズがコンパクトに出来、インスタレーション等での応用がしやすいと思われる。
-
-現在はint32の1データ通信のみ実装しているが、FloatやStringも比較的簡単に実装できると思われる。
 
 This is an OSC implementation for [Adafruit Featehr M0](https://learn.adafruit.com/adafruit-feather-m0-express-designed-for-circuit-python-circuitpython) + [Ethernet FeatherWing](https://www.adafruit.com/product/3201). It should also run on [M4](https://learn.adafruit.com/adafruit-feather-m4-express-atsamd51), although I haven't tested.
 
 As we build digital interactive installations, we often use OSC as device communication. Normally you would use ArduOSC, but I could not compile directly due to corrupt dependency. So I thought it would be faster to write my own implementation. Please see dependencies on platformio.ini. On Platformio the libraries should be automatically downloaded.
 To use OSC communication in small controllers like Arduino, you often see the combination of ArduinoUno + Ethernet top, however it tends to be bit bulky. Also you can't use Neopixel or other libraries using interruption. For this purpose you could also use the combination of Mbed + MbedEther module, but its footprint is still larger than Feather + EtherWing. Also you need to consider bit of wiring, while you can just stack modules when you use Feather combo.
 
-Right now I've only implemented int32 1 data transmission, but it seems easiliy feasible implementing Float or String. Please feel free to do that.
-
 ## Dependency
 * Arduino / Platformio
 * [Ethernet](https://platformio.org/lib/show/872/Ethernet)
 * [Adafruit NeoPixel](https://platformio.org/lib/show/28/Adafruit%20NeoPixel)
+
+## Restrictions
+### Implementation
+現在はint32及びStringのみ実装。複数のデータ送信、受信も実装。Floatは未実装。Int32にUint8/Int8を4つPackして送受信することも可能。
+
+Right now I've only implemented int32 and String multiple data transmission, but it seems easiliy feasible implementing Float as well. Please feel free to do that.
+
+### UDP packet bufffer size
+受信OSCメッセージはUDPパケットバッファにより制限される。
+Incoming OSC messages are restricted by UDP packet buffer size defined by the libdeps/adafruit_feather_m0_express/Ethernet/src/Ethernet.h
+UDP_TX_PACKET_MAX_SIZE
+
+Ethernetライブラリでは24Byteであったが、64Byteに変更している。テストしきれていないが、現在影響はないようだ。
+I've modified the value from original 24 bytes to 64. I haven't tracked the complete consequences of the modification, but so far it's working without any issue.
+
+### Address path
+Multi-layered path of the address like: /mesasge/subcontainer/instruction are treated as one single long path.
 
 ## About OSC
 ### The official OSC documentaiton
