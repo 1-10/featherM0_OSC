@@ -10,7 +10,7 @@ FeatherOSC::FeatherOSC(EthernetUDP *u):udp(u)
     // // Path: .pio/libdeps/adafruit_feather_m0_express/Ethernet/src/Ethernet.h
     // // 2200924: Changed to 64 bytes
     packetBuffer = new char[UDP_TX_PACKET_MAX_SIZE];
-    
+
     // macAddress = {MAC_ADDRESS_1, MAC_ADDRESS_2, MAC_ADDRESS_3, MAC_ADDRESS_4, MAC_ADDRESS_5, MAC_ADDRESS_6};
     macAddress[0] = MAC_ADDRESS_1;
     macAddress[1] = MAC_ADDRESS_2;
@@ -58,10 +58,11 @@ bool FeatherOSC::fullCompareAddress(String addr, String matchingText)
     if (addr.startsWith(matchingText))
     {
         debug.print("compare address tags: ", DEBUG_OSC);
-        debug.println((uint8_t)addr.length(), DEBUG_OSC);
+        debug.print((uint8_t)addr.length(), DEBUG_OSC);
+        debug.print(" ", DEBUG_OSC);
         debug.println((uint8_t)matchingText.length(), DEBUG_OSC);
-        if (addr.length() == matchingText.length())
-            return true;
+
+        if (addr.length() == matchingText.length()) return true;
     }
     return false;
 }
@@ -87,11 +88,11 @@ uint8_t *FeatherOSC::unpackint32(int32_t int32packet)
     retVal[2] = (int32packet >> 8) & 0xFF;
     retVal[3] = int32packet & 0xFF;
     debug.printNumHex(retVal[0], DEBUG_OSC);
-    debug.print(" ", DEBUG_OSC);
+    debug.print("  ", DEBUG_OSC);
     debug.printNumHex(retVal[1], DEBUG_OSC);
-    debug.print(" ", DEBUG_OSC);
+    debug.print("  ", DEBUG_OSC);
     debug.printNumHex(retVal[2], DEBUG_OSC);
-    debug.print(" ", DEBUG_OSC);
+    debug.print("  ", DEBUG_OSC);
     debug.printlnNumHex(retVal[3], DEBUG_OSC);
     return retVal;
 }
@@ -170,23 +171,25 @@ OSC_DATA_PACKET FeatherOSC::checkOSCpackets()
         String messageTags = "";
 
         // OSC message container
-        int32_t valInt32_OSC_i[4] = {0, 0, 0, 0};
+        int32_t valInt32_OSC_i[OSC_MAX_DATA_COUNTS] = {0};
         uint8_t valInt32Ptr = 0;
+        String string_OSC[OSC_MAX_DATA_COUNTS] = {""};
+        uint8_t string_OSC_ptr = 0;
         uint8_t dataPosition = 0;
         // check the first charactor of every four bytes
         for (uint8_t parsedHeaderPosition = 0; parsedHeaderPosition < packetSize; parsedHeaderPosition += 4)
         {
-            debug.print("Header: ", DEBUG_OSC);
-            debug.println(parsedHeaderPosition, DEBUG_OSC);
+            // debug.print("Header: ", DEBUG_OSC);
+            // debug.println(parsedHeaderPosition, DEBUG_OSC);
             /****************** address extraction ******************************/
             if (packetBuffer[parsedHeaderPosition] == '/' && !addressFound) // Looks up first '/'
             {
                 for (uint8_t j = parsedHeaderPosition + 1; j < packetSize; j++)
                 { // Read the address/container name after the "/"
-                    debug.print("j: ", DEBUG_OSC);
-                    debug.print(j, DEBUG_OSC);
-                    debug.print(" ", DEBUG_OSC);
-                    debug.println(packetBuffer[j], DEBUG_OSC);
+                    // debug.print("j: ", DEBUG_OSC);
+                    // debug.print(j, DEBUG_OSC);
+                    // debug.print(" ", DEBUG_OSC);
+                    // debug.println(packetBuffer[j], DEBUG_OSC);
 
                     if (!addressFound)
                     {
@@ -224,10 +227,13 @@ OSC_DATA_PACKET FeatherOSC::checkOSCpackets()
                         {
                             dataCountDone = true;
                             debug.print("data count: ", DEBUG_OSC);
-                            debug.println(dataCount, DEBUG_OSC);
+                            debug.print(dataCount, DEBUG_OSC);
+                            debug.print(", tags: ", DEBUG_OSC);
+                            debug.println(messageTags, DEBUG_OSC);
+
                             parsedHeaderPosition = (j / 4 + 1) * 4;
-                            debug.print("Header: ", DEBUG_OSC);
-                            debug.println(parsedHeaderPosition, DEBUG_OSC);
+                            // debug.print("Header: ", DEBUG_OSC);
+                            // debug.println(parsedHeaderPosition, DEBUG_OSC);
 
                             dataPosition = parsedHeaderPosition;
 
@@ -240,6 +246,7 @@ OSC_DATA_PACKET FeatherOSC::checkOSCpackets()
             if (dataCountDone)
             {
                 uint8_t t = (parsedHeaderPosition - dataPosition) / 4;
+                // In case the message is Int32
                 if (messageTags[t] == 'i')
                 {
                     int32_t valInt32 = 0;
@@ -254,6 +261,7 @@ OSC_DATA_PACKET FeatherOSC::checkOSCpackets()
                     valInt32_OSC_i[valInt32Ptr++] = valInt32;
                     debug.println(valInt32Ptr, DEBUG_OSC);
                 }
+                // In case the message is String
                 else if (messageTags[t] == 's')
                 {
                     String messageString = "";
@@ -261,19 +269,27 @@ OSC_DATA_PACKET FeatherOSC::checkOSCpackets()
                     while (packetBuffer[k] != char(0))
                     {
                         debug.printNumHex((uint8_t)packetBuffer[k], DEBUG_OSC);
+                        debug.print("/", DEBUG_OSC);
+                        debug.print(packetBuffer[k], DEBUG_OSC);
                         debug.print(" ", DEBUG_OSC);
                         messageString += packetBuffer[k];
                         if (k >= packetSize)
                         {
-                            parsedHeaderPosition = (k / 4 + 1) * 4;
-                            debug.print(" Header", DEBUG_OSC);
-                            debug.println(parsedHeaderPosition, DEBUG_OSC);
-
+                            debug.println("Oops, over run", DEBUG_OSC);
                             break;
                         }
+                        k++;
+                    }
+                    if(messageString.length() > 0)
+                    {
+                        string_OSC[string_OSC_ptr++] = messageString;
+                        debug.println("stored string", DEBUG_OSC);
                     }
                     debug.print(" /", DEBUG_OSC);
                     debug.println(messageString, DEBUG_OSC);
+                    parsedHeaderPosition = (k / 4) * 4;
+                    // parsedHeaderPosition = (k / 4 + 1) * 4;
+                    debug.println(parsedHeaderPosition, DEBUG_OSC);
                 }
             }
         }
@@ -286,13 +302,30 @@ OSC_DATA_PACKET FeatherOSC::checkOSCpackets()
 
             if (fullCompareAddress(address, OSC_ADDRESS_NEOPIXEL))
             {
-                debug.println("matched", DEBUG_OSC);
+                debug.println("osc tag matched", DEBUG_OSC);
 
                 oscData.message = OSC_NEOPIXEL;
+
+                // store data to the oscData container according to the messageTags
+                string_OSC_ptr = 0;
+                valInt32Ptr = 0;
                 for (uint8_t i = 0; i < dataCount; i++)
                 {
-                    oscData.dataContent[i].intData = valInt32_OSC_i[i];
+                    if (messageTags[i] == 'i'){
+                        oscData.dataContent[i].intData = valInt32_OSC_i[valInt32Ptr++];
+                        oscData.dataContent[i].dataType = OSC_INT32;
+                    }
+                    else if (messageTags[i] == 's')
+                    {
+                        if (string_OSC[string_OSC_ptr].length() > 0)
+                        {
+                            // debug.println("stored string to oscData", DEBUG_OSC);
+                            oscData.dataContent[i].strData = string_OSC[string_OSC_ptr++];
+                            oscData.dataContent[i].dataType = OSC_STR;
+                        }
+                    }
                 }
+                oscData.dataCounts = dataCount;
             }
 #ifdef INT32PACK
             // This sequence extracts packed four uint_8_t in single int32 to the original four int8_t s

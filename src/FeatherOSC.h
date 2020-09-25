@@ -36,6 +36,9 @@
 #define OSC_ADDRESS_NEOPIXEL "neo"
 #define OSC_ADDRESS_LED "led"
 
+#define OSC_MAX_DATA_COUNTS 4
+// #define INT32_PACK
+
 enum STATUS
 {
     STARTED,
@@ -56,8 +59,6 @@ enum OSC_DATA_TYPE
     OSC_FLOAT
 };
 
-#define OSC_MAX_DATA_COUNTS 4
-// #define INT32_PACK
 
 // Data container for the incoming osc data
 // dataType, intData

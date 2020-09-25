@@ -19,16 +19,16 @@ To use OSC communication in small controllers like Arduino, you often see the co
 
 ## Restrictions
 ### Implementation
-現在はint32及びStringのみ実装。複数のデータ送信、受信も実装。Floatは未実装。Int32にUint8/Int8を4つPackして送受信することも可能。
+現在はint32及びStringのみ実装。複数のデータ送信、受信も実装。Floatは未実装。Int32にUint8/Int8を4つPackして送受信することも可能。データ数は最大4個としている。FeatherOSC.h/OSC_MAX_DATA_COUNTSを変更すれば拡張可能だがテストしていない。同時にUDPバッファサイズを変更する必要性も考慮すること。
 
-Right now I've only implemented int32 and String multiple data transmission, but it seems easiliy feasible implementing Float as well. Please feel free to do that.
+Right now I've only implemented int32 and String multiple data transmission, but it seems easiliy feasible implementing Float as well. Please feel free to do that. Maximum data counts are set to 4, but can be modified with FeatherOSC.h/OSC_MAX_DATA_COUNTS. But I have not tested. Also please do consider changing UDP buffer size accordingly.
 
 ### UDP packet bufffer size
 受信OSCメッセージはUDPパケットバッファにより制限される。
 Incoming OSC messages are restricted by UDP packet buffer size defined by the libdeps/adafruit_feather_m0_express/Ethernet/src/Ethernet.h
 UDP_TX_PACKET_MAX_SIZE
 
-Ethernetライブラリでは24Byteであったが、64Byteに変更している。テストしきれていないが、現在影響はないようだ。
+Ethernetライブラリでは24Byteであったが、現在64Byteに変更している。テストしきれていないが、現在影響はないようだ。
 I've modified the value from original 24 bytes to 64. I haven't tracked the complete consequences of the modification, but so far it's working without any issue.
 
 ### Address path

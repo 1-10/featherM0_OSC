@@ -168,6 +168,13 @@ void loop() {
 
     // Do some actions here
     if (oscData.message != ACTION_NONE) {
+        debug.println("Received data:", DEBUG_OSC);
+        for (uint8_t i = 0; i < oscData.dataCounts; i ++){
+            if (oscData.dataContent[i].dataType == OSC_INT32)
+                debug.println(oscData.dataContent[i].intData, DEBUG_OSC);
+            if (oscData.dataContent[i].dataType == OSC_STR)
+                debug.println(oscData.dataContent[i].strData, DEBUG_OSC);
+        }
         controlLED(oscData);
     }
 
