@@ -9,6 +9,28 @@
 // CS pin for the Feather Ethernet board
 #define CS_PIN 10
 
+// Put your MAC address here:
+#define MAC_ADDRESS_1 0x98
+#define MAC_ADDRESS_2 0x76
+#define MAC_ADDRESS_3 0xB6
+#define MAC_ADDRESS_4 0x11
+#define MAC_ADDRESS_5 0xab
+#define MAC_ADDRESS_6 0xd5
+
+// Local IP and PortNo.
+#define IP_ADDRESS_1 192
+#define IP_ADDRESS_2 168
+#define IP_ADDRESS_3 0
+#define IP_ADDRESS_4 3
+#define LOCAL_PORT 8888
+
+// Host IP and Port
+#define HOST_IP_ADDRESS_1 192
+#define HOST_IP_ADDRESS_2 168
+#define HOST_IP_ADDRESS_3 0
+#define HOST_IP_ADDRESS_4 2
+#define HOST_PORT 8889
+
 #define OSC_ADDRESS_START "start"
 #define OSC_ADDRESS_BUTTON "button"
 #define OSC_ADDRESS_NEOPIXEL "neo"
@@ -61,7 +83,8 @@ class FeatherOSC{
 
     public:
         FeatherOSC(EthernetUDP *u); // Intializer
-        void init(IPAddress hostIP, unsigned int hostPort);
+        // void init(IPAddress lcoalIP, unsigned int lcoalPort, IPAddress hostIP, unsigned int hostPort);
+        void init();
         OSC_DATA_PACKET checkOSCpackets();
         void sendOSCstatus(STATUS);
 
@@ -69,11 +92,11 @@ class FeatherOSC{
         bool fullCompareAddress(String, String);
         uint8_t parseMachineNo(String, String);
         uint8_t *unpackint32(int32_t);
-        byte mac[6];
-        // IPAddress ip;
-        // unsigned int localPort;
+        byte macAddress[6];
+        IPAddress _localIP;
+        IPAddress _hostIP;
+        unsigned int localPort;
         unsigned int hostPort;
-        IPAddress hostIP;
         char *packetBuffer;
         EthernetUDP *udp;
 

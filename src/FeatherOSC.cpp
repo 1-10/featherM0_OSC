@@ -2,9 +2,6 @@
 #include "utils/Debug.h"
 #include "setting.h"
 
-// An EthernetUDP instance to let us send and receive packets over UDP
-// EthernetUDP Udp;
-
 extern Debug debug;
 
 FeatherOSC::FeatherOSC(EthernetUDP *u):udp(u)
@@ -13,30 +10,47 @@ FeatherOSC::FeatherOSC(EthernetUDP *u):udp(u)
     // // Path: .pio/libdeps/adafruit_feather_m0_express/Ethernet/src/Ethernet.h
     // // 2200924: Changed to 64 bytes
     packetBuffer = new char[UDP_TX_PACKET_MAX_SIZE];
+    
+    // macAddress = {MAC_ADDRESS_1, MAC_ADDRESS_2, MAC_ADDRESS_3, MAC_ADDRESS_4, MAC_ADDRESS_5, MAC_ADDRESS_6};
+    macAddress[0] = MAC_ADDRESS_1;
+    macAddress[1] = MAC_ADDRESS_2;
+    macAddress[2] = MAC_ADDRESS_3;
+    macAddress[3] = MAC_ADDRESS_4;
+    macAddress[4] = MAC_ADDRESS_5;
+    macAddress[5] = MAC_ADDRESS_6;
+    localPort = LOCAL_PORT;
+    hostPort = HOST_PORT;
+
+    IPAddress hostIP(HOST_IP_ADDRESS_1, HOST_IP_ADDRESS_2, HOST_IP_ADDRESS_3, HOST_IP_ADDRESS_4);
+    IPAddress localIP(IP_ADDRESS_1, IP_ADDRESS_2, IP_ADDRESS_3, IP_ADDRESS_4);
+
+    _hostIP = hostIP;
+    _localIP = localIP;
+
 };
 
-void FeatherOSC::init(IPAddress host_ip, unsigned int host_port)
-{
-    hostPort = host_port;
-    hostIP = host_ip;
-//     // Ethernet.init(CS_PIN);
-//     // Ethernet.begin(mac, ip);
-//     // // Check for Ethernet hardware present
-//     // if (Ethernet.hardwareStatus() == EthernetNoHardware)
-//     // {
-//     //     debug.println("Ethernet shield was not found.  Sorry, bro. Can't run without hardware. :(", DEBUG_GENERAL);
-//     //     while (true)
-//     //     {
-//     //         delay(1); // do nothing, no point running without Ethernet hardware
-//     //     }
-//     // }
-//     // if (Ethernet.linkStatus() == LinkOFF)
-//     // {
-//     //     debug.println("Ethernet cable is not connected.", DEBUG_GENERAL);
-//     // }
+    // void FeatherOSC::init(IPAddress local_ip, unsigned int local_port, IPAddress host_ip, unsigned int host_port)
+    void FeatherOSC::init()
+    {
 
-//     // // start UDP
-//     // udp->begin(localPort);
+        Ethernet.init(CS_PIN);
+        Ethernet.begin(macAddress, _localIP);
+        // Check for Ethernet hardware present
+        if (Ethernet.hardwareStatus() == EthernetNoHardware)
+        {
+            debug.println("Ethernet shield was not found.  Sorry, bro. Can't run without hardware. :(", DEBUG_GENERAL);
+            while (true)
+            {
+                delay(1); // do nothing, no point running without Ethernet hardware
+            }
+        }
+        if (Ethernet.linkStatus() == LinkOFF)
+        {
+            debug.println("Ethernet cable is not connected.", DEBUG_GENERAL);
+        }
+
+        // start UDP
+        udp->begin(localPort);
 }
 
 bool FeatherOSC::fullCompareAddress(String addr, String matchingText)
@@ -355,7 +369,7 @@ void FeatherOSC::sendOSCstatus(enum STATUS stat)
                 debug.print(" ", DEBUG_OSC);
         }
 
-        udp->beginPacket(hostIP, hostPort);
+        udp->beginPacket(_hostIP, hostPort);
         udp->write(packetBuffer, UDP_TX_PACKET_MAX_SIZE);
         udp->endPacket();
     }
