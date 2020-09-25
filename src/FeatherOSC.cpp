@@ -169,13 +169,15 @@ OSC_DATA_PACKET FeatherOSC::checkOSCpackets()
         bool dataCountDone = false;
         uint8_t dataCount = 0;
         String messageTags = "";
+        uint8_t messageTagPtr = 0;
 
         // OSC message container
         int32_t valInt32_OSC_i[OSC_MAX_DATA_COUNTS] = {0};
         uint8_t valInt32Ptr = 0;
         String string_OSC[OSC_MAX_DATA_COUNTS] = {""};
         uint8_t string_OSC_ptr = 0;
-        uint8_t dataPosition = 0;
+        // uint8_t dataPosition = 0;
+        
         // check the first charactor of every four bytes
         for (uint8_t parsedHeaderPosition = 0; parsedHeaderPosition < packetSize; parsedHeaderPosition += 4)
         {
@@ -235,7 +237,7 @@ OSC_DATA_PACKET FeatherOSC::checkOSCpackets()
                             // debug.print("Header: ", DEBUG_OSC);
                             // debug.println(parsedHeaderPosition, DEBUG_OSC);
 
-                            dataPosition = parsedHeaderPosition;
+                            // dataPosition = parsedHeaderPosition;
 
                             break; // exit from j's for loop
                         }
@@ -245,10 +247,11 @@ OSC_DATA_PACKET FeatherOSC::checkOSCpackets()
             /****************** Data extraction ******************************/
             if (dataCountDone)
             {
-                uint8_t t = (parsedHeaderPosition - dataPosition) / 4;
+                // uint8_t t = (parsedHeaderPosition - dataPosition) / 4;
                 // In case the message is Int32
-                if (messageTags[t] == 'i')
+                if (messageTags[messageTagPtr] == 'i')
                 {
+                    debug.println("i", DEBUG_OSC);
                     int32_t valInt32 = 0;
                     for (uint8_t k = 0; k < 4; k++)
                     {
@@ -259,11 +262,13 @@ OSC_DATA_PACKET FeatherOSC::checkOSCpackets()
                     debug.print(" /", DEBUG_OSC);
                     debug.println((uint16_t)valInt32, DEBUG_OSC);
                     valInt32_OSC_i[valInt32Ptr++] = valInt32;
-                    debug.println(valInt32Ptr, DEBUG_OSC);
+                    // debug.println(valInt32Ptr, DEBUG_OSC);
+                    messageTagPtr++;
                 }
                 // In case the message is String
-                else if (messageTags[t] == 's')
+                else if (messageTags[messageTagPtr] == 's')
                 {
+                    debug.println("s", DEBUG_OSC);
                     String messageString = "";
                     uint8_t k = parsedHeaderPosition;
                     while (packetBuffer[k] != char(0))
@@ -281,15 +286,17 @@ OSC_DATA_PACKET FeatherOSC::checkOSCpackets()
                         k++;
                     }
                     if(messageString.length() > 0)
-                    {
+                    {                        
                         string_OSC[string_OSC_ptr++] = messageString;
-                        debug.println("stored string", DEBUG_OSC);
+                        debug.print("stored string", DEBUG_OSC);
+                        debug.print(": ", DEBUG_OSC);
+                        debug.println(messageString, DEBUG_OSC);
+
+                        parsedHeaderPosition = (k / 4) * 4;
+                        debug.println(parsedHeaderPosition, DEBUG_OSC);
                     }
-                    debug.print(" /", DEBUG_OSC);
-                    debug.println(messageString, DEBUG_OSC);
-                    parsedHeaderPosition = (k / 4) * 4;
                     // parsedHeaderPosition = (k / 4 + 1) * 4;
-                    debug.println(parsedHeaderPosition, DEBUG_OSC);
+                    messageTagPtr++;
                 }
             }
         }
@@ -319,9 +326,26 @@ OSC_DATA_PACKET FeatherOSC::checkOSCpackets()
                     {
                         if (string_OSC[string_OSC_ptr].length() > 0)
                         {
-                            // debug.println("stored string to oscData", DEBUG_OSC);
-                            oscData.dataContent[i].strData = string_OSC[string_OSC_ptr++];
-                            oscData.dataContent[i].dataType = OSC_STR;
+                            char msgStr[string_OSC[string_OSC_ptr].length()];
+                            string_OSC[string_OSC_ptr].toCharArray(msgStr, string_OSC[string_OSC_ptr].length());
+
+                            float floatVal = strtof(msgStr, NULL);
+                            debug.print(floatVal, DEBUG_OSC);
+                            debug.print(" ", DEBUG_OSC);
+
+                            // if the initial letter of the mesageString is 0, regard the string message text
+                            if (floatVal == 0.0 && msgStr[0] != '0'){
+                                debug.println("stored string to oscData", DEBUG_OSC);
+                                oscData.dataContent[i].strData = string_OSC[string_OSC_ptr];
+                                oscData.dataContent[i].dataType = OSC_STR;
+                            }
+                            else
+                            {
+                                debug.println(" stored float to oscData", DEBUG_OSC);
+                                oscData.dataContent[i].floatData = floatVal;
+                                oscData.dataContent[i].dataType = OSC_FLOAT;
+                            }
+                            string_OSC_ptr++;
                         }
                     }
                 }

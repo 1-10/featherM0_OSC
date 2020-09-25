@@ -113,6 +113,26 @@ void Debug::println(int32_t val, uint8_t level)
 #endif
 }
 
+void Debug::print(float val, uint8_t level)
+{
+#ifdef DEBUG
+    if (level & outputLevel)
+    {
+        stream->print(val);
+    }
+#endif
+}
+
+void Debug::println(float val, uint8_t level)
+{
+#ifdef DEBUG
+    if (level & outputLevel)
+    {
+        stream->println(val);
+    }
+#endif
+}
+
 void Debug::println(String str, uint8_t level) {
     #ifdef DEBUG
         if ( level & outputLevel ){

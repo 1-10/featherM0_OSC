@@ -67,7 +67,7 @@ struct OSC_DATA
     OSC_DATA_TYPE dataType;
     int32_t intData;
     String strData;
-    // float floatData;
+    float floatData;
 };
 
 // Data packet structure

@@ -19,9 +19,9 @@ To use OSC communication in small controllers like Arduino, you often see the co
 
 ## Restrictions
 ### Implementation
-現在はint32及びStringのみ実装。複数のデータ送信、受信も実装。Floatは未実装。Int32にUint8/Int8を4つPackして送受信することも可能。データ数は最大4個としている。FeatherOSC.h/OSC_MAX_DATA_COUNTSを変更すれば拡張可能だがテストしていない。同時にUDPバッファサイズを変更する必要性も考慮すること。
+現在はint32及びStringのみ実装。複数のデータ送信、受信も実装。OSC仕様書にあるFloatは未実装だが、Stringとして贈られてくるFloatには対応ずみ。Int32にUint8/Int8を4つPackして送受信することも可能。データ数は最大4個としている。FeatherOSC.h/OSC_MAX_DATA_COUNTSを変更すれば拡張可能だがテストしていない。同時にUDPバッファサイズを変更する必要性も考慮すること。
 
-Right now I've only implemented int32 and String multiple data transmission, but it seems easiliy feasible implementing Float as well. Please feel free to do that. Maximum data counts are set to 4, but can be modified with FeatherOSC.h/OSC_MAX_DATA_COUNTS. But I have not tested. Also please do consider changing UDP buffer size accordingly.
+Right now I've only implemented int32 and String multiple data transmission. I have't implemented Float32, but already implemented float data transmission via string. Maximum data counts are set to 4, but can be modified with FeatherOSC.h/OSC_MAX_DATA_COUNTS. But I have not tested. Also please do consider changing UDP buffer size accordingly.
 
 ### UDP packet bufffer size
 受信OSCメッセージはUDPパケットバッファにより制限される。

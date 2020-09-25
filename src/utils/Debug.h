@@ -26,6 +26,8 @@ class Debug{
         void println(uint16_t, uint8_t level);
         void print(int32_t, uint8_t level);
         void println(int32_t, uint8_t level);
+        void print(float, uint8_t level);
+        void println(float, uint8_t level);
         // void println(const __FlashStringHelper*, uint8_t level);
         // void print(const __FlashStringHelper*, uint8_t level);
         void println(String, uint8_t level);
