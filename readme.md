@@ -60,3 +60,6 @@ Device IP address : 192.168.0.3, Port: 8888
 Please modify setting.h according to your set up.
 
 ![Set up](https://github.com/1-10/featherM0_OSC/blob/master/IMG_1233e.jpg?raw=true)
+
+## Change Log
+20200925: made the code to library

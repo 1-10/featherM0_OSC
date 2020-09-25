@@ -1,3 +1,5 @@
+#ifndef _SETTING_H_
+#define _SETTING_H_
 /******************** Mode ************************/
 // Debug mode settings: see debug.h for detail Following functions are implemented
 #include "utils/Debug.h"
@@ -18,39 +20,39 @@ struct LED{
 };
 
 
-/******************** OSC Protocol settings ************************/
-#define OSC_ADDRESS_START "start"
-#define OSC_ADDRESS_BUTTON "button"
-#define OSC_ADDRESS_NEOPIXEL "neo"
-#define OSC_ADDRESS_LED "led"
+// /******************** OSC Protocol settings ************************/
+// #define OSC_ADDRESS_START "start"
+// #define OSC_ADDRESS_BUTTON "button"
+// #define OSC_ADDRESS_NEOPIXEL "neo"
+// #define OSC_ADDRESS_LED "led"
 
-#define OSC_JAPANESE 0
-#define OSC_ENGLISH 1
-#define OSC_CHINESE 2
+// #define OSC_JAPANESE 0
+// #define OSC_ENGLISH 1
+// #define OSC_CHINESE 2
 
-enum STATUS {STARTED,BUTTON_PUSHED, NONE};
-enum OSC_MESSAGE {LED_ON, LED_OFF, OSC_NEOPIXEL, ACTION_NONE};
-enum OSC_DATA_TYPE {OSC_INT32, OSC_STR, OSC_FLOAT};
+// enum STATUS {STARTED,BUTTON_PUSHED, NONE};
+// enum OSC_MESSAGE {LED_ON, LED_OFF, OSC_NEOPIXEL, ACTION_NONE};
+// enum OSC_DATA_TYPE {OSC_INT32, OSC_STR, OSC_FLOAT};
 
-#define OSC_MAX_DATA_COUNTS 4
-// #define INT32_PACK
+// #define OSC_MAX_DATA_COUNTS 4
+// // #define INT32_PACK
 
-// Data container for the incoming osc data
-// dataType, intData
-struct OSC_DATA{
-    OSC_DATA_TYPE dataType;
-    int32_t intData;
-    // String strData;
-    // float floatData;
-};
+// // Data container for the incoming osc data
+// // dataType, intData
+// struct OSC_DATA{
+//     OSC_DATA_TYPE dataType;
+//     int32_t intData;
+//     String strData;
+//     // float floatData;
+// };
 
-// Data packet structure
-// data counts, message: osc message in OSC_MESSAGE structure, dataContent: message content as OSC_DATA structure
-struct OSC_DATA_PACKET{
-    uint8_t dataCounts = OSC_MAX_DATA_COUNTS;
-    OSC_MESSAGE message;
-    OSC_DATA dataContent[OSC_MAX_DATA_COUNTS];
-};
+// // Data packet structure
+// // data counts, message: osc message in OSC_MESSAGE structure, dataContent: message content as OSC_DATA structure
+// struct OSC_DATA_PACKET{
+//     uint8_t dataCounts = OSC_MAX_DATA_COUNTS;
+//     OSC_MESSAGE message;
+//     OSC_DATA dataContent[OSC_MAX_DATA_COUNTS];
+// };
 
 
 /************** SETTINGS_ETHERNET ***************/
@@ -84,3 +86,5 @@ const byte IP_ADDRESS[4] = {192, 168, 0, 3};
 
 // Local port No.
 #define LOCAL_PORT 8888
+
+#endif
